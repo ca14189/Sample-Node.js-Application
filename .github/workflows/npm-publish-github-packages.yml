@@ -19,7 +19,7 @@ jobs:
           script: |
             cd /home/ubuntu
             rm -rf my-app
-            git clone https://github.com/<your-username>/<your-repo>.git my-app
+            git clone https://github.com/ca14189/Sample-Node.js-Application.git my-app
             cd my-app
             npm install
             pm2 stop my-app || true
