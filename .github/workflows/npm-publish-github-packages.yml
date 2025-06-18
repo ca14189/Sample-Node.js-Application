@@ -1,38 +1,16 @@
-name: Node.js CI/CD to EC2 (SCP + SSH)
+name: Deploy Node App to EC2
 
 on:
   push:
-    branches: [master]  # Change to `main` if needed
+    branches:
+      - master  # Or main, depending on your branch
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Archive project
-        run: zip -r app.zip . -x "node_modules/*"
-
-      - name: Copy files to EC2 using SCP
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_KEY }}
-          source: "app.zip"
-          target: "/home/ubuntu"
-
-      - name: Connect to EC2 and deploy
+      - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -41,12 +19,8 @@ jobs:
           script: |
             cd /home/ubuntu
             rm -rf my-app
-            mkdir my-app
-            unzip -o app.zip -d my-app
+            git clone https://github.com/<your-username>/<your-repo>.git my-app
             cd my-app
-            curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-            sudo apt-get install -y nodejs
-            sudo npm install -g pm2
             npm install
-            pm2 delete my-app || true
+            pm2 stop my-app || true
             pm2 start server.js --name my-app
