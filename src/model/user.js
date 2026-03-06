@@ -1,4 +1,4 @@
-// src/model/user.js
+// hhsrc/model/user.js
 var mongoose = require('mongoose');
 var bcrypt   = require('bcrypt-nodejs');
 
